@@ -2,7 +2,7 @@
 
 namespace EduEDiary.Tests;
 
-public class ElectronicDiaryFixture
+public class EduEDiaryTestData
 {
     public static List<Grades> TestGradesList()
     {
@@ -71,7 +71,7 @@ public class ElectronicDiaryFixture
                 Student = student1, 
                 Subject = subject2, 
                 Grade = 5, 
-                Date = new DateOnly(2023, 10, 11) 
+                Date = new DateOnly(2023, 10, 16) 
             },
             new() { 
                 Id = 3, 
@@ -155,7 +155,7 @@ public class ElectronicDiaryFixture
                 Student = student3, 
                 Subject = subject4, 
                 Grade = 5, 
-                Date = new DateOnly(2023, 10, 15) 
+                Date = new DateOnly(2023, 10, 19) 
             },
             new() { 
                 Id = 15, 
