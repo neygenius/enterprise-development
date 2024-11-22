@@ -57,6 +57,7 @@ public class EduEDiaryTestData
             Class = class5 
         };
 
+        // Создание ведомости
         var grades = new List<Grades>
         {
             new() { 

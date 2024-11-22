@@ -1,24 +1,28 @@
-using EduEDiary.Domain;
+п»їusing EduEDiary.Domain;
 
 namespace EduEDiary.Tests;
 
 public class EduEDiaryTests() : IClassFixture<EduEDiaryTestData>
 {
-    // Проверка: Вывести информацию обо всех предметах
+    /// <summary>
+    /// РџСЂРѕРІРµСЂРєР°: Р’С‹РІРµСЃС‚Рё РёРЅС„РѕСЂРјР°С†РёСЋ РѕР±Рѕ РІСЃРµС… РїСЂРµРґРјРµС‚Р°С…
+    /// </summary>
     [Fact]
     public void AllSubjectsTest()
     {
         var subjects = EduEDiaryTestData.TestGradesList()
             .Select(g => g.Subject).ToList();
 
-        Assert.Contains(subjects, s => s.Name == "Математика");
-        Assert.Contains(subjects, s => s.Name == "Русский язык");
-        Assert.Contains(subjects, s => s.Name == "Литература");
-        Assert.Contains(subjects, s => s.Name == "История");
-        Assert.Contains(subjects, s => s.Name == "Физика");
+        Assert.Contains(subjects, s => s.Name == "РњР°С‚РµРјР°С‚РёРєР°");
+        Assert.Contains(subjects, s => s.Name == "Р СѓСЃСЃРєРёР№ СЏР·С‹Рє");
+        Assert.Contains(subjects, s => s.Name == "Р›РёС‚РµСЂР°С‚СѓСЂР°");
+        Assert.Contains(subjects, s => s.Name == "РСЃС‚РѕСЂРёСЏ");
+        Assert.Contains(subjects, s => s.Name == "Р¤РёР·РёРєР°");
     }
 
-    // Проверка: Вывести информацию обо всех учениках в указанном классе, упорядочить по ФИО
+    /// <summary>
+    /// РџСЂРѕРІРµСЂРєР°: Р’С‹РІРµСЃС‚Рё РёРЅС„РѕСЂРјР°С†РёСЋ РѕР±Рѕ РІСЃРµС… СѓС‡РµРЅРёРєР°С… РІ СѓРєР°Р·Р°РЅРЅРѕРј РєР»Р°СЃСЃРµ, СѓРїРѕСЂСЏРґРѕС‡РёС‚СЊ РїРѕ Р¤РРћ
+    /// </summary>
     [Fact]
     public void AllStudentsInSelectedClassTest()
     {
@@ -30,10 +34,12 @@ public class EduEDiaryTests() : IClassFixture<EduEDiaryTestData>
             .OrderBy(s => s.FullName)
             .ToList();
 
-        Assert.Equal("Сидоров Михаил Иванович", students.First().FullName);
+        Assert.Equal("РЎРёРґРѕСЂРѕРІ РњРёС…Р°РёР» РРІР°РЅРѕРІРёС‡", students.First().FullName);
     }
 
-    // Проверка: Вывести информацию обо всех учениках, получивших оценки в указанный день
+    /// <summary>
+    /// РџСЂРѕРІРµСЂРєР°: Р’С‹РІРµСЃС‚Рё РёРЅС„РѕСЂРјР°С†РёСЋ РѕР±Рѕ РІСЃРµС… СѓС‡РµРЅРёРєР°С…, РїРѕР»СѓС‡РёРІС€РёС… РѕС†РµРЅРєРё РІ СѓРєР°Р·Р°РЅРЅС‹Р№ РґРµРЅСЊ
+    /// </summary>
     [Fact]
     public void AllStudentsThatGetGradeInSelectedDayTest()
     {
@@ -45,12 +51,14 @@ public class EduEDiaryTests() : IClassFixture<EduEDiaryTestData>
             .Distinct()
             .ToList();
 
-        Assert.Contains(students, s => s.FullName == "Иванов Николай Егорович");
-        Assert.Contains(students, s => s.FullName == "Петров Алекей Дмитриевич");
-        Assert.Contains(students, s => s.FullName == "Максимов Семён Викторович");
+        Assert.Contains(students, s => s.FullName == "РРІР°РЅРѕРІ РќРёРєРѕР»Р°Р№ Р•РіРѕСЂРѕРІРёС‡");
+        Assert.Contains(students, s => s.FullName == "РџРµС‚СЂРѕРІ РђР»РµРєРµР№ Р”РјРёС‚СЂРёРµРІРёС‡");
+        Assert.Contains(students, s => s.FullName == "РњР°РєСЃРёРјРѕРІ РЎРµРјС‘РЅ Р’РёРєС‚РѕСЂРѕРІРёС‡");
     }
 
-    // Проверка: Вывести топ 5 учеников по среднему баллу
+    /// <summary>
+    /// РџСЂРѕРІРµСЂРєР°: Р’С‹РІРµСЃС‚Рё С‚РѕРї 5 СѓС‡РµРЅРёРєРѕРІ РїРѕ СЃСЂРµРґРЅРµРјСѓ Р±Р°Р»Р»Сѓ
+    /// </summary>
     [Fact]
     public void TopFiveStudentsForAvgGradeTest()
     {
@@ -65,14 +73,16 @@ public class EduEDiaryTests() : IClassFixture<EduEDiaryTestData>
             .Take(5)
             .ToList();
 
-        Assert.Equal("Иванов Николай Егорович", students[0].Student.FullName);
-        Assert.Equal("Петров Алекей Дмитриевич", students[1].Student.FullName);
-        Assert.Equal("Сидоров Михаил Иванович", students[2].Student.FullName);
-        Assert.Equal("Максимов Семён Викторович", students[3].Student.FullName);
-        Assert.Equal("Кузнецов Василий Алексеевич", students[4].Student.FullName);
+        Assert.Equal("РРІР°РЅРѕРІ РќРёРєРѕР»Р°Р№ Р•РіРѕСЂРѕРІРёС‡", students[0].Student.FullName);
+        Assert.Equal("РџРµС‚СЂРѕРІ РђР»РµРєРµР№ Р”РјРёС‚СЂРёРµРІРёС‡", students[1].Student.FullName);
+        Assert.Equal("РЎРёРґРѕСЂРѕРІ РњРёС…Р°РёР» РРІР°РЅРѕРІРёС‡", students[2].Student.FullName);
+        Assert.Equal("РњР°РєСЃРёРјРѕРІ РЎРµРјС‘РЅ Р’РёРєС‚РѕСЂРѕРІРёС‡", students[3].Student.FullName);
+        Assert.Equal("РљСѓР·РЅРµС†РѕРІ Р’Р°СЃРёР»РёР№ РђР»РµРєСЃРµРµРІРёС‡", students[4].Student.FullName);
     }
 
-    // Проверка: Вывести учеников с максимальным средним баллом за указанный период
+    /// <summary>
+    /// РџСЂРѕРІРµСЂРєР°: Р’С‹РІРµСЃС‚Рё СѓС‡РµРЅРёРєРѕРІ СЃ РјР°РєСЃРёРјР°Р»СЊРЅС‹Рј СЃСЂРµРґРЅРёРј Р±Р°Р»Р»РѕРј Р·Р° СѓРєР°Р·Р°РЅРЅС‹Р№ РїРµСЂРёРѕРґ
+    /// </summary>
     [Fact]
     public void StudentsWithMaxAvgGradeForTimeSpanTest()
     {
@@ -95,10 +105,12 @@ public class EduEDiaryTests() : IClassFixture<EduEDiaryTestData>
             .Select(a => a.Student)
             .ToList();
 
-        Assert.Equal("Иванов Николай Егорович", students.First().FullName);
+        Assert.Equal("РРІР°РЅРѕРІ РќРёРєРѕР»Р°Р№ Р•РіРѕСЂРѕРІРёС‡", students.First().FullName);
     }
 
-    // Проверка: Вывести информацию о минимальном, среднем и максимальном балле по каждому предмету
+    /// <summary>
+    /// РџСЂРѕРІРµСЂРєР°: Р’С‹РІРµСЃС‚Рё РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РјРёРЅРёРјР°Р»СЊРЅРѕРј, СЃСЂРµРґРЅРµРј Рё РјР°РєСЃРёРјР°Р»СЊРЅРѕРј Р±Р°Р»Р»Рµ РїРѕ РєР°Р¶РґРѕРјСѓ РїСЂРµРґРјРµС‚Сѓ
+    /// </summary>
     [Fact]
     public void MinAvgMaxGradeForEachSubjectTest()
     {
