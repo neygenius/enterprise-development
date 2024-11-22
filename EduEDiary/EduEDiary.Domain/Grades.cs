@@ -19,7 +19,7 @@ public class Grades
     /// </summary>
     public required int Grade { get; set; }
     /// <summary>
-    /// Дата полученияоценки
+    /// Дата получения оценки
     /// </summary>
     public required DateOnly Date { get; set; }
 }
