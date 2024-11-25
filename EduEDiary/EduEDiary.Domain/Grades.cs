@@ -1,6 +1,6 @@
 ﻿namespace EduEDiary.Domain;
 
-public class Grade
+public class Grades
 {
     /// <summary>
     /// Идентификатор оценки
@@ -9,15 +9,15 @@ public class Grade
     /// <summary>
     /// Студент, получивший оценку
     /// </summary>
-    public required Student Student { get; set; }
+    public required Students Student { get; set; }
     /// <summary>
     /// Предмет, по которому получена оценка
     /// </summary>
-    public required Subject Subject { get; set; }
+    public required Subjects Subject { get; set; }
     /// <summary>
     /// Оценка по предмету
     /// </summary>
-    public required int GradeValue { get; set; }
+    public required int Grade { get; set; }
     /// <summary>
     /// Дата получения оценки
     /// </summary>

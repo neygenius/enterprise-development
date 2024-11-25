@@ -1,6 +1,6 @@
 ﻿namespace EduEDiary.Domain;
 
-public class Student
+public class Students
 {
     /// <summary>
     /// Идентификатор учащегося
@@ -21,5 +21,5 @@ public class Student
     /// <summary>
     /// Класс учащегося
     /// </summary>
-    public required Class Class { get; set; }  
+    public required Classes Class { get; set; }  
 }

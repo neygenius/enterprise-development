@@ -1,4 +1,6 @@
-﻿namespace EduEDiary.Tests;
+﻿using EduEDiary.Domain;
+
+namespace EduEDiary.Tests;
 
 public class EduEDiaryTests() : IClassFixture<EduEDiaryTestData>
 {
@@ -27,8 +29,8 @@ public class EduEDiaryTests() : IClassFixture<EduEDiaryTestData>
         var classId = 3;
 
         var students = EduEDiaryTestData.TestGradesList()
-            .Select(g => g.Student)
-            .Where(s => s.Class.Id == classId)
+            .Select (g => g.Student)
+            .Where (s => s.Class.Id == classId)
             .OrderBy(s => s.FullName)
             .ToList();
 
@@ -62,10 +64,9 @@ public class EduEDiaryTests() : IClassFixture<EduEDiaryTestData>
     {
         var students = EduEDiaryTestData.TestGradesList()
             .GroupBy(g => g.Student)
-            .Select(g => new
-            {
+            .Select(g => new {
                 Student = g.Key,
-                AvgGrade = g.Average(gr => gr.GradeValue)
+                AvgGrade = g.Average(gr => gr.Grade)
             })
             .OrderByDescending(a => a.AvgGrade)
             .ThenBy(a => a.Student.Id)
@@ -91,10 +92,9 @@ public class EduEDiaryTests() : IClassFixture<EduEDiaryTestData>
         var sGrades = EduEDiaryTestData.TestGradesList()
             .Where(g => g.Date >= start && g.Date <= end)
             .GroupBy(g => g.Student)
-            .Select(g => new
-            {
+            .Select(g => new {
                 Student = g.Key,
-                AvgGrade = g.Average(gr => gr.GradeValue)
+                AvgGrade = g.Average(gr => gr.Grade)
             })
             .ToList();
 
@@ -119,9 +119,9 @@ public class EduEDiaryTests() : IClassFixture<EduEDiaryTestData>
             .Select(g => new
             {
                 Subject = g.Key,
-                MinGrade = g.Min(gr => gr.GradeValue),
-                MaxGrade = g.Max(gr => gr.GradeValue),
-                AvgGrade = g.Average(gr => gr.GradeValue)
+                MinGrade = g.Min(gr => gr.Grade),
+                MaxGrade = g.Max(gr => gr.Grade),
+                AvgGrade = g.Average(gr => gr.Grade)
             })
             .ToList();
 

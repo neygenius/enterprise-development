@@ -1,6 +1,6 @@
 ﻿namespace EduEDiary.Domain;
 
-public class Subject
+public class Subjects
 {
     /// <summary>
     /// Идентификатор предмета
