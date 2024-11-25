@@ -1,21 +1,21 @@
 ﻿namespace EduEDiary.Domain.Repositories;
 
-public class ClassesRepository : IRepository<Classes>
+public class ClassRepository : IRepository<Class>
 {
-    private readonly List<Classes> _classes = [];
+    private readonly List<Class> _classes = [];
     private int _id = 1;
 
-    public List<Classes> GetAll() => _classes;
+    public List<Class> GetAll() => _classes;
 
-    public Classes? Get(int id) => _classes.Find(c => c.Id == id);
+    public Class? Get(int id) => _classes.Find(c => c.Id == id);
 
-    public void Post(Classes obj)
+    public void Post(Class obj)
     {
         obj.Id = _id++;
         _classes.Add(obj);
     }
 
-    public bool Put(Classes obj, int id)
+    public bool Put(Class obj, int id)
     {
         var oldClass = Get(id);
         if (oldClass == null)

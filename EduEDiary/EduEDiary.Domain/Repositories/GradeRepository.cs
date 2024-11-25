@@ -1,21 +1,21 @@
 ﻿namespace EduEDiary.Domain.Repositories;
 
-public class GradesRepository : IRepository<Grades>
+public class GradeRepository : IRepository<Grade>
 {
-    private readonly List<Grades> _grades = [];
+    private readonly List<Grade> _grades = [];
     private int _id = 1;
 
-    public List<Grades> GetAll() => _grades;
+    public List<Grade> GetAll() => _grades;
 
-    public Grades? Get(int id) => _grades.Find(s => s.Id == id);
+    public Grade? Get(int id) => _grades.Find(g => g.Id == id);
 
-    public void Post(Grades obj)
+    public void Post(Grade obj)
     {
         obj.Id = _id++;
         _grades.Add(obj);
     }
 
-    public bool Put(Grades obj, int id)
+    public bool Put(Grade obj, int id)
     {
         var oldGrade = Get(id);
         if (oldGrade == null)
@@ -23,7 +23,7 @@ public class GradesRepository : IRepository<Grades>
         oldGrade.Id = obj.Id;
         oldGrade.Student = obj.Student;
         oldGrade.Subject = obj.Subject;
-        oldGrade.Grade = obj.Grade;
+        oldGrade.GradeValue = obj.GradeValue;
         oldGrade.Date = obj.Date;
         return true;
     }
