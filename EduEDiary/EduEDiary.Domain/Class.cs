@@ -1,6 +1,6 @@
 ﻿namespace EduEDiary.Domain;
 
-public class Classes
+public class Class
 {
     /// <summary>
     /// Идентификатор класса
