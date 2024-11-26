@@ -5,7 +5,7 @@ public interface IRepository<T>
     /// <summary>
     /// Возвращает список всех объектов
     /// </summary>
-    /// <returns>Список всех объекты</returns>
+    /// <returns>Список всех объектов</returns>
     public List<T> GetAll();
 
     /// <summary>
