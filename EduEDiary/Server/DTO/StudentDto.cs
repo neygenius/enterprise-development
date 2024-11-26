@@ -1,14 +1,13 @@
-﻿namespace EduEDiary.Domain;
+﻿using System.ComponentModel.DataAnnotations;
 
-public class Student
+namespace Server.DTO;
+
+public class StudentDto
 {
-    /// <summary>
-    /// Идентификатор учащегося
-    /// </summary>
-    public required int Id { get; set; }
     /// <summary>
     /// Серия и номер паспорта учащегося
     /// </summary>
+    [RegularExpression(@"\d{4}\s\d{6}")]
     public required string Passport { get; set; }
     /// <summary>
     /// ФИО учащегося
@@ -19,7 +18,7 @@ public class Student
     /// </summary>
     public required DateOnly BirthDate { get; set; }
     /// <summary>
-    /// Класс учащегося
+    /// Идентификатор класса учащегося
     /// </summary>
-    public required Class Class { get; set; }
+    public required int ClassId { get; set; }
 }

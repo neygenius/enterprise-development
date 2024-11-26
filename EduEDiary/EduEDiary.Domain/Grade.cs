@@ -7,7 +7,7 @@ public class Grade
     /// </summary>
     public required int Id { get; set; }
     /// <summary>
-    /// Студент, получивший оценку
+    /// Учащийся, получивший оценку
     /// </summary>
     public required Student Student { get; set; }
     /// <summary>

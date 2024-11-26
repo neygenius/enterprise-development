@@ -3,13 +3,13 @@
 public interface IRepository<T>
 {
     /// <summary>
-    /// Возвращает все объекты
+    /// Возвращает список всех объектов
     /// </summary>
-    /// <returns>Все объекты</returns>
+    /// <returns>Список всех объекты</returns>
     public List<T> GetAll();
 
     /// <summary>
-    /// Возвращает объект по идентификатору
+    /// Возвращает объект по указанному идентификатору
     /// </summary>
     /// <param name="id">Идентификатор объекта</param>
     /// <returns>Найденный объект, или null</returns>
@@ -22,7 +22,7 @@ public interface IRepository<T>
     public void Post(T obj);
 
     /// <summary>
-    /// Заменяет объект, соответствующий идентификатору на новый
+    /// Заменяет объект, соответствующий идентификатору, на новый
     /// </summary>
     /// <param name="obj">Новый объект</param>
     /// <param name="id">Идентификатор объекта</param>

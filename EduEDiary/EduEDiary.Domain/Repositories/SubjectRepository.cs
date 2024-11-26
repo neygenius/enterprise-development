@@ -18,7 +18,7 @@ public class SubjectRepository : IRepository<Subject>
     public bool Put(Subject obj, int id)
     {
         var oldSubject = Get(id);
-        if (oldSubject == null) 
+        if (oldSubject == null)
             return false;
         oldSubject.Id = obj.Id;
         oldSubject.Name = obj.Name;
@@ -29,7 +29,7 @@ public class SubjectRepository : IRepository<Subject>
     public bool Delete(int id)
     {
         var deletedSubject = Get(id);
-        if (deletedSubject == null) 
+        if (deletedSubject == null)
             return false;
         _subjects.Remove(deletedSubject);
         return true;
