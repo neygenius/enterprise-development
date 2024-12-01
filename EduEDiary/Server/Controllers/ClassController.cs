@@ -15,9 +15,11 @@ public class ClassController(IRepository<Class> repository, IMapper mapper) : Co
     /// </summary>
     /// <returns>Список всех классов и http status</returns>
     [HttpGet]
-    public ActionResult<IEnumerable<Class>> Get()
+    public async Task<ActionResult<IEnumerable<Class>>> Get()
     {
-        return Ok(repository.GetAll());
+        var classes = await repository.GetAll();
+
+        return Ok(classes);
     }
 
     /// <summary>
@@ -26,10 +28,9 @@ public class ClassController(IRepository<Class> repository, IMapper mapper) : Co
     /// <param name="id">Идентификатор класса</param>
     /// <returns>Класс и http status</returns>
     [HttpGet("{id}")]
-    public ActionResult<Class> Get(int id)
+    public async Task<ActionResult<Class>> Get(int id)
     {
-        var classValue = repository.Get(id);
-
+        var classValue = await repository.Get(id);
         if (classValue == null)
             return NotFound();
 
@@ -41,13 +42,13 @@ public class ClassController(IRepository<Class> repository, IMapper mapper) : Co
     /// </summary>
     /// <param name="value">Экземпляр, добавляемый в коллекцию</param>
     [HttpPost]
-    public IActionResult Post([FromBody] ClassDto value)
+    public async Task<IActionResult> Post([FromBody] ClassDto value)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
         var classValue = mapper.Map<Class>(value);
-        repository.Post(classValue);
+        await repository.Post(classValue);
 
         return Ok();
     }
@@ -58,16 +59,18 @@ public class ClassController(IRepository<Class> repository, IMapper mapper) : Co
     /// <param name="id">Идентификатор класса</param>
     /// <param name="value">Экземпляр, заменяющий старый экземпляр в коллекции</param>
     [HttpPut("{id}")]
-    public IActionResult Put(int id, [FromBody] ClassDto value)
+    public async Task<IActionResult> Put(int id, [FromBody] ClassDto value)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
+        var checkClass = await repository.Get(id);
+        if (checkClass == null)
+            return NotFound();
+
         var classValue = mapper.Map<Class>(value);
         classValue.Id = id;
-
-        if (!repository.Put(classValue, id))
-            return NotFound();
+        await repository.Put(classValue, id);
 
         return Ok();
     }
@@ -77,10 +80,13 @@ public class ClassController(IRepository<Class> repository, IMapper mapper) : Co
     /// </summary>
     /// <param name="id">Идентификатор класса</param>
     [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
-        if (!repository.Delete(id))
+        var classValue = await repository.Get(id);
+        if (classValue == null)
             return NotFound();
+
+        await repository.Delete(id);
 
         return Ok();
     }

@@ -1,39 +1,40 @@
-﻿namespace EduEDiary.Domain.Repositories;
+﻿using Microsoft.EntityFrameworkCore;
 
-public class GradeRepository : IRepository<Grade>
+namespace EduEDiary.Domain.Repositories;
+
+public class GradeRepository(EduEDiaryContext context) : IRepository<Grade>
 {
-    private readonly List<Grade> _grades = [];
-    private int _id = 1;
+    public async Task<List<Grade>> GetAll() => await context.Grades.Include(g => g.Student).Include(g => g.Subject).ToListAsync();
 
-    public List<Grade> GetAll() => _grades;
+    public async Task<Grade?> Get(int id) => await context.Grades.Include(g => g.Student).Include(g => g.Subject).FirstOrDefaultAsync(g => g.Id == id);
 
-    public Grade? Get(int id) => _grades.Find(g => g.Id == id);
-
-    public void Post(Grade obj)
+    public async Task Post(Grade obj)
     {
-        obj.Id = _id++;
-        _grades.Add(obj);
+        await context.Grades.AddAsync(obj);
+        await context.SaveChangesAsync();
     }
 
-    public bool Put(Grade obj, int id)
+    public async Task Put(Grade obj, int id)
     {
-        var oldGrade = Get(id);
+        var oldGrade = await Get(id);
         if (oldGrade == null)
-            return false;
-        oldGrade.Id = obj.Id;
+            return;
+
         oldGrade.Student = obj.Student;
         oldGrade.Subject = obj.Subject;
         oldGrade.GradeValue = obj.GradeValue;
         oldGrade.Date = obj.Date;
-        return true;
+        context.Grades.Update(oldGrade);
+        await context.SaveChangesAsync();
     }
 
-    public bool Delete(int id)
+    public async Task Delete(int id)
     {
-        var deletedGrade = Get(id);
+        var deletedGrade = await Get(id);
         if (deletedGrade == null)
-            return false;
-        _grades.Remove(deletedGrade);
-        return true;
+            return;
+
+        context.Grades.Remove(deletedGrade);
+        await context.SaveChangesAsync();
     }
 }

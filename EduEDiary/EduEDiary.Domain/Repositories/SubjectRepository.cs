@@ -1,37 +1,38 @@
-﻿namespace EduEDiary.Domain.Repositories;
+﻿using Microsoft.EntityFrameworkCore;
 
-public class SubjectRepository : IRepository<Subject>
+namespace EduEDiary.Domain.Repositories;
+
+public class SubjectRepository(EduEDiaryContext context) : IRepository<Subject>
 {
-    private readonly List<Subject> _subjects = [];
-    private int _id = 1;
+    public async Task<List<Subject>> GetAll() => await context.Subjects.ToListAsync();
 
-    public List<Subject> GetAll() => _subjects;
+    public async Task<Subject?> Get(int id) => await context.Subjects.FindAsync(id);
 
-    public Subject? Get(int id) => _subjects.Find(s => s.Id == id);
-
-    public void Post(Subject obj)
+    public async Task Post(Subject obj)
     {
-        obj.Id = _id++;
-        _subjects.Add(obj);
+        await context.Subjects.AddAsync(obj);
+        await context.SaveChangesAsync();
     }
 
-    public bool Put(Subject obj, int id)
+    public async Task Put(Subject obj, int id)
     {
-        var oldSubject = Get(id);
+        var oldSubject = await Get(id);
         if (oldSubject == null)
-            return false;
-        oldSubject.Id = obj.Id;
+            return;
+
         oldSubject.Name = obj.Name;
         oldSubject.Year = obj.Year;
-        return true;
+        context.Subjects.Update(oldSubject);
+        await context.SaveChangesAsync();
     }
 
-    public bool Delete(int id)
+    public async Task Delete(int id)
     {
-        var deletedSubject = Get(id);
+        var deletedSubject = await Get(id);
         if (deletedSubject == null)
-            return false;
-        _subjects.Remove(deletedSubject);
-        return true;
+            return;
+
+        context.Subjects.Remove(deletedSubject);
+        await context.SaveChangesAsync();
     }
 }

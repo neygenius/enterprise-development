@@ -1,39 +1,40 @@
-﻿namespace EduEDiary.Domain.Repositories;
+﻿using Microsoft.EntityFrameworkCore;
 
-public class StudentRepository : IRepository<Student>
+namespace EduEDiary.Domain.Repositories;
+
+public class StudentRepository(EduEDiaryContext context) : IRepository<Student>
 {
-    private readonly List<Student> _students = [];
-    private int _id = 1;
+    public async Task<List<Student>> GetAll() => await context.Students.Include(s => s.Class).ToListAsync();
 
-    public List<Student> GetAll() => _students;
+    public async Task<Student?> Get(int id) => await context.Students.Include(s => s.Class).FirstOrDefaultAsync(s => s.Id == id);
 
-    public Student? Get(int id) => _students.Find(s => s.Id == id);
-
-    public void Post(Student obj)
+    public async Task Post(Student obj)
     {
-        obj.Id = _id++;
-        _students.Add(obj);
+        await context.Students.AddAsync(obj);
+        await context.SaveChangesAsync();
     }
 
-    public bool Put(Student obj, int id)
+    public async Task Put(Student obj, int id)
     {
-        var oldStudent = Get(id);
+        var oldStudent = await Get(id);
         if (oldStudent == null)
-            return false;
-        oldStudent.Id = obj.Id;
+            return;
+
         oldStudent.Passport = obj.Passport;
         oldStudent.FullName = obj.FullName;
         oldStudent.BirthDate = obj.BirthDate;
         oldStudent.Class = obj.Class;
-        return true;
+        context.Students.Update(oldStudent);
+        await context.SaveChangesAsync();
     }
 
-    public bool Delete(int id)
+    public async Task Delete(int id)
     {
-        var deletedStudent = Get(id);
+        var deletedStudent = await Get(id);
         if (deletedStudent == null)
-            return false;
-        _students.Remove(deletedStudent);
-        return true;
+            return;
+
+        context.Students.Remove(deletedStudent);
+        await context.SaveChangesAsync();
     }
 }

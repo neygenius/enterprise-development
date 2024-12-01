@@ -1,37 +1,38 @@
-﻿namespace EduEDiary.Domain.Repositories;
+﻿using Microsoft.EntityFrameworkCore;
 
-public class ClassRepository : IRepository<Class>
+namespace EduEDiary.Domain.Repositories;
+
+public class ClassRepository(EduEDiaryContext context) : IRepository<Class>
 {
-    private readonly List<Class> _classes = [];
-    private int _id = 1;
+    public async Task<List<Class>> GetAll() => await context.Classes.ToListAsync();
 
-    public List<Class> GetAll() => _classes;
+    public async Task<Class?> Get(int id) => await context.Classes.FindAsync(id);
 
-    public Class? Get(int id) => _classes.Find(c => c.Id == id);
-
-    public void Post(Class obj)
+    public async Task Post(Class obj)
     {
-        obj.Id = _id++;
-        _classes.Add(obj);
+        await context.Classes.AddAsync(obj);
+        await context.SaveChangesAsync();
     }
 
-    public bool Put(Class obj, int id)
+    public async Task Put(Class obj, int id)
     {
-        var oldClass = Get(id);
+        var oldClass = await Get(id);
         if (oldClass == null)
-            return false;
-        oldClass.Id = obj.Id;
+            return;
+
         oldClass.Number = obj.Number;
         oldClass.Letter = obj.Letter;
-        return true;
+        context.Classes.Update(oldClass);
+        await context.SaveChangesAsync();
     }
 
-    public bool Delete(int id)
+    public async Task Delete(int id)
     {
-        var deletedClass = Get(id);
+        var deletedClass = await Get(id);
         if (deletedClass == null)
-            return false;
-        _classes.Remove(deletedClass);
-        return true;
+            return;
+
+        context.Classes.Remove(deletedClass);
+        await context.SaveChangesAsync();
     }
 }

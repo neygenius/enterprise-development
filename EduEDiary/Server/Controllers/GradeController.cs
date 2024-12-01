@@ -8,16 +8,23 @@ namespace Server.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class GradeController(IRepository<Grade> repository, IMapper mapper) : ControllerBase
+public class GradeController(
+    IRepository<Grade> repository,
+    IRepository<Student> studentRepository,
+    IRepository<Subject> subjectRepository,
+    IMapper mapper
+    ) : ControllerBase
 {
     /// <summary>
     /// Возвращает список всех оценок
     /// </summary>
     /// <returns>Список всех оценок и http status</returns>
     [HttpGet]
-    public ActionResult<IEnumerable<Grade>> Get()
+    public async Task<ActionResult<IEnumerable<Grade>>> Get()
     {
-        return Ok(repository.GetAll());
+        var grades = await repository.GetAll();
+
+        return Ok(grades);
     }
 
     /// <summary>
@@ -26,10 +33,9 @@ public class GradeController(IRepository<Grade> repository, IMapper mapper) : Co
     /// <param name="id">Идентификатор оценки</param>
     /// <returns>Оценка и http status</returns>
     [HttpGet("{id}")]
-    public ActionResult<Grade> Get(int id)
+    public async Task<ActionResult<Grade>> Get(int id)
     {
-        var grade = repository.Get(id);
-
+        var grade = await repository.Get(id);
         if (grade == null)
             return NotFound();
 
@@ -41,13 +47,23 @@ public class GradeController(IRepository<Grade> repository, IMapper mapper) : Co
     /// </summary>
     /// <param name="value">Экземпляр, добавляемый в коллекцию</param>
     [HttpPost]
-    public IActionResult Post([FromBody] GradeDto value)
+    public async Task<IActionResult> Post([FromBody] GradeDto value)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
         var grade = mapper.Map<Grade>(value);
-        repository.Post(grade);
+        var student = await studentRepository.Get(value.StudentId);
+        if (student == null)
+            NotFound();
+
+        var subject = await subjectRepository.Get(value.SubjectId);
+        if (subject == null)
+            NotFound();
+
+        grade.Student = student;
+        grade.Subject = subject;
+        await repository.Post(grade);
 
         return Ok();
     }
@@ -58,16 +74,28 @@ public class GradeController(IRepository<Grade> repository, IMapper mapper) : Co
     /// <param name="id">Идентификатор оценки</param>
     /// <param name="value">Экземпляр, заменяющий старый экземпляр в коллекции</param>
     [HttpPut("{id}")]
-    public IActionResult Put(int id, [FromBody] GradeDto value)
+    public async Task<IActionResult> Put(int id, [FromBody] GradeDto value)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
+        var checkGrade = await repository.Get(id);
+        if (checkGrade == null)
+            return NotFound();
+
         var grade = mapper.Map<Grade>(value);
         grade.Id = id;
+        var student = await studentRepository.Get(value.StudentId);
+        if (student == null)
+            NotFound();
 
-        if (!repository.Put(grade, id))
-            return NotFound();
+        var subject = await subjectRepository.Get(value.SubjectId);
+        if (subject == null)
+            NotFound();
+
+        grade.Student = student;
+        grade.Subject = subject;
+        await repository.Put(grade, id);
 
         return Ok();
     }
@@ -77,10 +105,13 @@ public class GradeController(IRepository<Grade> repository, IMapper mapper) : Co
     /// </summary>
     /// <param name="id">Идентификатор оценки</param>
     [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
-        if (!repository.Delete(id))
+        var grade = await repository.Get(id);
+        if (grade == null)
             return NotFound();
+
+        await repository.Delete(id);
 
         return Ok();
     }

@@ -8,16 +8,18 @@ namespace Server.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class StudentController(IRepository<Student> repository, IMapper mapper) : ControllerBase
+public class StudentController(IRepository<Student> repository, IRepository<Class> classRepository, IMapper mapper) : ControllerBase
 {
     /// <summary>
     /// Возвращает список всех студентов
     /// </summary>
     /// <returns>Список всех студентов и http status</returns>
     [HttpGet]
-    public ActionResult<IEnumerable<Student>> Get()
+    public async Task<ActionResult<IEnumerable<Student>>> Get()
     {
-        return Ok(repository.GetAll());
+        var students = await repository.GetAll();
+
+        return Ok(students);
     }
 
     /// <summary>
@@ -26,10 +28,9 @@ public class StudentController(IRepository<Student> repository, IMapper mapper) 
     /// <param name="id">Идентификатор студента</param>
     /// <returns>Студент и http status</returns>
     [HttpGet("{id}")]
-    public ActionResult<Student> Get(int id)
+    public async Task<ActionResult<Student>> Get(int id)
     {
-        var student = repository.Get(id);
-
+        var student = await repository.Get(id);
         if (student == null)
             return NotFound();
 
@@ -41,13 +42,18 @@ public class StudentController(IRepository<Student> repository, IMapper mapper) 
     /// </summary>
     /// <param name="value">Экземпляр, добавляемый в коллекцию</param>
     [HttpPost]
-    public IActionResult Post([FromBody] StudentDto value)
+    public async Task<IActionResult> Post([FromBody] StudentDto value)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
         var student = mapper.Map<Student>(value);
-        repository.Post(student);
+        var classValue = await classRepository.Get(value.ClassId);
+        if (classValue == null)
+            return NotFound();
+
+        student.Class = classValue;
+        await repository.Post(student);
 
         return Ok();
     }
@@ -58,16 +64,23 @@ public class StudentController(IRepository<Student> repository, IMapper mapper) 
     /// <param name="id">Идентификатор студента</param>
     /// <param name="value">Экземпляр, заменяющий старый экземпляр в коллекции</param>
     [HttpPut("{id}")]
-    public IActionResult Put(int id, [FromBody] StudentDto value)
+    public async Task<IActionResult> Put(int id, [FromBody] StudentDto value)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
+        var checkStudent = await repository.Get(id);
+        if (checkStudent == null)
+            return NotFound();
+
         var student = mapper.Map<Student>(value);
         student.Id = id;
-
-        if (!repository.Put(student, id))
+        var classValue = await classRepository.Get(value.ClassId);
+        if (classValue == null)
             return NotFound();
+
+        student.Class = classValue;
+        await repository.Put(student, id);
 
         return Ok();
     }
@@ -77,12 +90,14 @@ public class StudentController(IRepository<Student> repository, IMapper mapper) 
     /// </summary>
     /// <param name="id">Идентификатор студента</param>
     [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
-        if (!repository.Delete(id))
+        var student = await repository.Get(id);
+        if (student == null)
             return NotFound();
+
+        await repository.Delete(id);
 
         return Ok();
     }
 }
-

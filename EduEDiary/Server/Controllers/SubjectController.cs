@@ -15,9 +15,11 @@ public class SubjectController(IRepository<Subject> repository, IMapper mapper) 
     /// </summary>
     /// <returns>Список всех предметов и http status</returns>
     [HttpGet]
-    public ActionResult<IEnumerable<Subject>> Get()
+    public async Task<ActionResult<IEnumerable<Subject>>> Get()
     {
-        return Ok(repository.GetAll());
+        var subjects = await repository.GetAll();
+
+        return Ok(subjects);
     }
 
     /// <summary>
@@ -26,10 +28,9 @@ public class SubjectController(IRepository<Subject> repository, IMapper mapper) 
     /// <param name="id">Идентификатор предмета</param>
     /// <returns>Предмет и http status</returns>
     [HttpGet("{id}")]
-    public ActionResult<Subject> Get(int id)
+    public async Task<ActionResult<Subject>> Get(int id)
     {
-        var subject = repository.Get(id);
-
+        var subject = await repository.Get(id);
         if (subject == null)
             return NotFound();
 
@@ -41,13 +42,13 @@ public class SubjectController(IRepository<Subject> repository, IMapper mapper) 
     /// </summary>
     /// <param name="value">Экземпляр, добавляемый в коллекцию</param>
     [HttpPost]
-    public IActionResult Post([FromBody] SubjectDto value)
+    public async Task<IActionResult> Post([FromBody] SubjectDto value)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
         var subject = mapper.Map<Subject>(value);
-        repository.Post(subject);
+        await repository.Post(subject);
 
         return Ok();
     }
@@ -58,16 +59,18 @@ public class SubjectController(IRepository<Subject> repository, IMapper mapper) 
     /// <param name="id">Идентификатор предмета</param>
     /// <param name="value">Экземпляр, заменяющий старый экземпляр в коллекции</param>
     [HttpPut("{id}")]
-    public IActionResult Put(int id, [FromBody] SubjectDto value)
+    public async Task<IActionResult> Put(int id, [FromBody] SubjectDto value)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
+        var checkSubject = await repository.Get(id);
+        if (checkSubject == null)
+            return NotFound();
+
         var subject = mapper.Map<Subject>(value);
         subject.Id = id;
-
-        if (!repository.Put(subject, id))
-            return NotFound();
+        await repository.Put(subject, id);
 
         return Ok();
     }
@@ -77,10 +80,13 @@ public class SubjectController(IRepository<Subject> repository, IMapper mapper) 
     /// </summary>
     /// <param name="id">Идентификатор предмета</param>
     [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
-        if (!repository.Delete(id))
+        var subject = await repository.Get(id);
+        if (subject == null)
             return NotFound();
+
+        await repository.Delete(id);
 
         return Ok();
     }
