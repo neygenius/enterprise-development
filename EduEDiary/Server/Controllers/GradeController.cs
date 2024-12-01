@@ -55,11 +55,11 @@ public class GradeController(
         var grade = mapper.Map<Grade>(value);
         var student = await studentRepository.Get(value.StudentId);
         if (student == null)
-            NotFound();
+            return NotFound();
 
         var subject = await subjectRepository.Get(value.SubjectId);
         if (subject == null)
-            NotFound();
+            return NotFound();
 
         grade.Student = student;
         grade.Subject = subject;
@@ -87,11 +87,11 @@ public class GradeController(
         grade.Id = id;
         var student = await studentRepository.Get(value.StudentId);
         if (student == null)
-            NotFound();
+            return NotFound();
 
         var subject = await subjectRepository.Get(value.SubjectId);
         if (subject == null)
-            NotFound();
+            return NotFound();
 
         grade.Student = student;
         grade.Subject = subject;
