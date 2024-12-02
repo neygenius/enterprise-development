@@ -67,20 +67,20 @@ public class QueryController(
     [HttpGet("top_five_students_for_avg_grade")]
     public async Task<ActionResult<IEnumerable<StudentAvgGradeDto>>> GetTopFiveStudentsForAvgGrade()
     {
-        var grades = await gradeRepository.GetAll();
-
-        var students = (await studentRepository.GetAll())
-            .Select(s => new StudentAvgGradeDto
-            {
-                StudentId = s.Id,
-                FullName = s.FullName,
-                AvgGrade = grades
-                    .Where(g => g.Student.Id == s.Id)
-                    .Average(g => g.GradeValue)
-            })
-            .OrderByDescending(s => s.AvgGrade)
-            .Take(5)
-            .ToList();
+        var students = (from student in await studentRepository.GetAll()
+                        join grade in await gradeRepository.GetAll()
+                        on student.Id equals grade.Student.Id into studentGrades
+                        from sg in studentGrades.DefaultIfEmpty()
+                        group sg by new { student.Id, student.FullName } into grouped
+                        select new StudentAvgGradeDto
+                        {
+                            StudentId = grouped.Key.Id,
+                            FullName = grouped.Key.FullName,
+                            AvgGrade = grouped.Average(g => g != null ? (double?)g.GradeValue : null) ?? 0
+                        })
+                          .OrderByDescending(dto => dto.AvgGrade)
+                          .Take(5)
+                          .ToList();
 
         return Ok(students);
     }
@@ -93,17 +93,19 @@ public class QueryController(
     [HttpGet("students_with_max_avg_grade_for_time_span")]
     public async Task<ActionResult<IEnumerable<StudentAvgGradeDto>>> GetStudentsWithMaxAvgGradeForTimeSpan(DateOnly start, DateOnly end)
     {
-        var grades = await gradeRepository.GetAll();
-
-        var sGrades = (await studentRepository.GetAll())
-            .Select(s => new
-            {
-                Student = s,
-                AvgGrade = grades
-                    .Where(g => g.Student.Id == s.Id && g.Date >= start && g.Date <= end)
-                    .Average(g => g.GradeValue)
-            })
-            .ToList();
+        var sGrades = (from student in await studentRepository.GetAll()
+                      join grade in await gradeRepository.GetAll()
+                      on student.Id equals grade.Student.Id into studentGrades
+                      from sg in studentGrades.DefaultIfEmpty()
+                      where sg == null || (sg.Date >= start && sg.Date <= end)
+                      group sg by new { student.Id, student.FullName } into grouped
+                      select new
+                      {
+                          Student = grouped.Key,
+                          AvgGrade = grouped
+                              .Where(g => g != null)
+                              .Average(g => (double?)g.GradeValue) ?? 0
+                      }).ToList();
 
         var maxAvgGrade = sGrades.Max(a => a.AvgGrade);
 
@@ -126,7 +128,7 @@ public class QueryController(
     [HttpGet("min_avg_max_grade_for_each_subject")]
     public async Task<ActionResult<IEnumerable<GradeStatisticsDto>>> GetMinAvgMaxGradeForEachSubject()
     {
-        var grades = await gradeRepository.GetAll();
+        var grades = (await gradeRepository.GetAll());
 
         var statistics = (await subjectRepository.GetAll())
             .Select(s => new GradeStatisticsDto
@@ -134,13 +136,19 @@ public class QueryController(
                 Subject = s.Name,
                 MinGrade = grades
                     .Where(g => g.Subject.Id == s.Id)
-                    .Min(g => g.GradeValue),
+                    .Select(g => g.GradeValue)
+                    .DefaultIfEmpty(0)
+                    .Min(),
                 MaxGrade = grades
                     .Where(g => g.Subject.Id == s.Id)
-                    .Max(g => g.GradeValue),
+                    .Select(g => g.GradeValue)
+                    .DefaultIfEmpty(0)
+                    .Max(),
                 AvgGrade = grades
                     .Where(g => g.Subject.Id == s.Id)
-                    .Average(g => g.GradeValue)
+                    .Select(g => g.GradeValue)
+                    .DefaultIfEmpty(0)
+                    .Average()
             })
             .ToList();
 
