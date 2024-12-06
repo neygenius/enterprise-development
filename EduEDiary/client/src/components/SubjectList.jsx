@@ -1,30 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api/api';
+import SubjectDelete from './SubjectDelete';
 
 const SubjectList = () => {
     const [subjects, setSubjects] = useState([]);
     const [message, setMessage] = useState('');
-    const [expandedSubjectId, setExpandedSubjectId] = useState(null);
-
-    const deleteSubject = async (id) => {
-        const confirmDelete = window.confirm("Are you sure you want to delete this subject?");
-        if (!confirmDelete) return;
-
-        try {
-            await api.delete(`/subject/${id}`);
-            setSubjects(subjects.filter((subject) => subject.id !== id));
-            setMessage('Subject deleted successfully!');
-            setTimeout(() => setMessage(''), 3000);
-        } catch (error) {
-            console.error('Error deleting subject:', error);
-            setMessage('Failed to delete subject.');
-            setTimeout(() => setMessage(''), 3000);
-        }
-    };
-
-    const toggleExpand = (id) => {
-        setExpandedSubjectId(expandedSubjectId === id ? null : id);
+    
+    const handleDeleteSuccess = (id) => {
+        setSubjects(subjects.filter((subject) => subject.id !== id));
     };
 
     useEffect(() => {
@@ -53,29 +37,19 @@ const SubjectList = () => {
             <ul className="list-group">
                 {subjects.length > 0 ? (
                     subjects.map((subject) => (
-                        <li key={subject.id} className="list-group-item">
-                            <div className="d-flex justify-content-between align-items-center">
-                                <span>{subject.Name}</span>
+                        <li key={subject.id} className="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <p><strong>Name:</strong> {subject.name}</p>
+                                <p><strong>Year:</strong> {subject.year}</p>
                             </div>
-                            <button
-                                className="btn btn-info btn-sm mt-2"
-                                onClick={() => toggleExpand(subject.id)}
-                            >
-                                Информация
-                            </button>
-                            {expandedSubjectId === subject.id && (
-                                <div className="mt-2">
-                                    <p><strong>Year:</strong> {subject.Year}</p>
-                                    <div className="mt-2">
-                                        <Link to={`/subject/update/${subject.id}`} className="btn btn-warning btn-sm me-2">Update</Link>
-                                        <button onClick={() => deleteSubject(subject.id)} className="btn btn-danger btn-sm">Delete</button>
-                                    </div>
-                                </div>
-                            )}
+                            <div>
+                                <Link to={`/subject/update/${subject.id}`} className="btn btn-warning btn-sm me-2">Update</Link>
+                                <SubjectDelete id={subject.id} onDeleteSuccess={handleDeleteSuccess} />
+                            </div>
                         </li>
                     ))
                 ) : (
-                    <li className="list-group-item">No subjects found.</li>
+                    <li className="list-group-item">No subjects found</li>
                 )}
             </ul>
         </div>

@@ -41,7 +41,7 @@ const SubjectUpdate = () => {
 
     return (
         <div className="container mt-5">
-            <h2>Edit Subject</h2>
+            <h2>Update Subject</h2>
             {message && (
                 <div className={`alert ${message.includes('Failed') ? 'alert-danger' : 'alert-success'}`} role="alert">
                     {message}
