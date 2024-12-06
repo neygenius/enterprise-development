@@ -74,6 +74,7 @@ const SubjectUpdate = () => {
                             value={year}
                             onChange={(e) => setYear(e.target.value)}
                             required
+                            pattern="\d{4}-\d{4}"
                         />
                     </div>
                     <button type="submit" className="btn btn-primary">Update Subject</button>
