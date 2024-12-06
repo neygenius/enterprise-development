@@ -1,25 +1,25 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import SubjectCreate from './components/SubjectCreate';
+import SubjectDelete from './components/SubjectDelete';
+import SubjectList from './components/SubjectList';
+import SubjectUpdate from './components/SubjectUpdate';
+
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    return (
+        <Router>
+            <div>
+                <h1 className="text-center">Subject Client</h1>
+                <Routes>
+                    <Route path="/" element={<SubjectList />} />
+                    <Route path="/subject/create" element={<SubjectCreate />} />
+                    <Route path="/subject/update/:id" element={<SubjectUpdate />} />
+                    <Route path="/subject/delete/:id" element={<SubjectDelete />} />
+                </Routes>
+            </div>
+        </Router>
+    );
 }
 
 export default App;
